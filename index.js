@@ -3,7 +3,8 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 3000;
 
-const { User } = require('./models/user'); 
+const { User } = require('./models/user');
+const { Subject } = require('./models/subject');
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json());
@@ -11,7 +12,7 @@ app.use(bodyParser.json());
 const mongoose = require('mongoose');
 const URL_MONGO = 'mongodb://prueba:hola123@ds239940.mlab.com:39940/checkin';
 
-mongoose.connect(URL_MONGO, {useNewUrlParser: true}, function (err) {
+mongoose.connect(URL_MONGO, { useNewUrlParser: true }, function (err) {
     if (err) {
         console.log('not conected ' + err);
     } else {
@@ -34,7 +35,7 @@ app.post('/users', (req, res) => {
     newUser.save((error, user) => {
         error
             ? res.status(409).send(error)
-            : res.send(user);
+            : res.status(201).send(user);
     });
 });
 
@@ -52,6 +53,49 @@ app.post('/login', (req, res) => {
             res.status(409).send('El usuario no existe.');
         }
     });
+});
+
+app.post('/subjects', (req, res) => {
+    const { name, description } = req.body;
+
+    const newSubject = Subject({
+        name,
+        description,
+    });
+
+    newSubject.save((error, subject) => {
+        error
+            ? res.status(409).send(error)
+            : res.status(201).send(subject);
+    });
+});
+
+app.get('/subjects', (req, res) => {
+    Subject.find()
+        .populate('students')
+        .exec()
+        .then(subjects => subjects ? res.send(subjects) : res.status(404).send({ message: 'Not found.' }))
+        .catch(error => res.status(409).send(error));
+});
+
+app.get('/subjects/:id', (req, res) => {
+    const { id } = req.params;
+
+    Subject.findById(id)
+        .populate('students')
+        .exec()
+        .then(subject => subject ? res.send(subject) : res.status(404).send({ message: 'Not found.' }))
+        .catch(error => res.status(409).send(error));
+});
+
+app.put('/subjects/:id', (req, res) => {
+    const { id } = req.params;
+    const { user } = req.body;
+
+    Subject.findOneAndUpdate(id, { $push: { students: user } })
+        .exec()
+        .then(subject => res.send(subject))
+        .catch(error => res.status(409).send(error));
 });
 
 app.listen(port, () => {
