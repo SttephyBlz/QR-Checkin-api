@@ -1,8 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
+const QREncode = require('qrcode');
 const { User } = require('./models/user');
 const { Subject } = require('./models/subject');
 
@@ -96,6 +97,16 @@ app.put('/subjects/:id', (req, res) => {
         .exec()
         .then(subject => res.send(subject))
         .catch(error => res.status(409).send(error));
+});
+
+app.get('/generate', (req, res) => {
+
+    const { text } = req.query;
+
+    QREncode
+        .toDataURL(text)
+        .then((result) => { res.send(result) })
+        .catch((error) => { res.send(error) })
 });
 
 app.listen(port, () => {
