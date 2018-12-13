@@ -6,6 +6,7 @@ const port = process.env.PORT || 3001;
 const QREncode = require('qrcode');
 const { User } = require('./models/user');
 const { Subject } = require('./models/subject');
+const { Attendance } = require('./models/attendance');
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json());
@@ -107,6 +108,30 @@ app.get('/generate', (req, res) => {
         .toDataURL(text)
         .then((result) => { res.send(result) })
         .catch((error) => { res.send(error) })
+});
+
+app.post('/attendance', (req, res) => {
+    const { subject, student } = req.body;
+    
+    const newAttendance = Attendance({
+        subject,
+        student,
+    });
+
+    newAttendance.save((error, attendance) => {
+        error
+            ? res.status(409).send(error)
+            : res.status(201).send(attendance);
+    });
+});
+
+app.get('/attendance', (req, res) => {
+    Attendance.find()
+        .populate('subject')
+        .populate('student')
+        .exec()
+        .then(attendance => res.send(attendance))
+        .catch(error => res.status(409).send(error));
 });
 
 app.listen(port, () => {
