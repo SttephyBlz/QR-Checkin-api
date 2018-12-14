@@ -117,7 +117,7 @@ app.post('/attendance', (req, res) => {
         subject,
         student,
     });
-
+ 
     newAttendance.save((error, attendance) => {
         error
             ? res.status(409).send(error)
