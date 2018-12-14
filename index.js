@@ -43,6 +43,13 @@ app.post('/users', (req, res) => {
     });
 });
 
+app.get('/users', (req, res) => {
+    User.find()
+        .exec()
+        .then(users => res.send(users))
+        .catch(error => res.status(409).send(error));
+});
+
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
