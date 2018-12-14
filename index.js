@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -10,6 +11,7 @@ const { Attendance } = require('./models/attendance');
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json());
+app.use(cors());
 
 const mongoose = require('mongoose');
 const URL_MONGO = 'mongodb://prueba:hola123@ds239940.mlab.com:39940/checkin';
