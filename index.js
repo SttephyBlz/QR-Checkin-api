@@ -103,7 +103,7 @@ app.put('/subjects/:id', (req, res) => {
     const { id } = req.params;
     const { user } = req.body;
 
-    Subject.findOneAndUpdate(id, { $push: { students: user } })
+    Subject.findByIdAndUpdate(id, { $push: { students: user } })
         .exec()
         .then(subject => res.send(subject))
         .catch(error => res.status(409).send(error));
